@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 from gensim.models import keyedvectors
+from embedding import Embedding
 import logging, sys
 
 logger = logging.getLogger(__name__)
@@ -18,15 +19,12 @@ def main():
     args = parser.parse_args()
 
     logger.info('Loading embedding')
-    if args.input.endswith('.gensim'):
-        emb = keyedvectors.KeyedVectors.load(args.input)
-    else:
-        emb = keyedvectors.KeyedVectors.load_word2vec_format(args.input)
+    emb = Embedding.load(args.input)
 
     logger.info('Evaluating')
-    pearson, spearman, oov_rate = emb.evaluate_word_pairs(args.wordsim)
+    pearson = emb.eval_sim(args.wordsim)
 
-    logger.info('Coverage={:.3}; Pearson={:.3f}; Spearman={:.3f}'.format(1-oov_rate/100, pearson[0], spearman[0]))
+    logger.info('Pearson={:.3f}'.format(pearson))
 
 if __name__ == '__main__':
     main()

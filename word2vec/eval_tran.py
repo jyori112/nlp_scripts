@@ -2,6 +2,7 @@
 import argparse
 from collections import defaultdict
 from gensim.models import keyedvectors
+from embedding import Embedding
 import logging, sys
 
 logger = logging.getLogger(__name__)
@@ -20,16 +21,10 @@ def main():
     args = parser.parse_args()
 
     logger.info('Load src embedding')
-    if args.src.endswith('.gensim'):
-        src_emb = keyedvectors.KeyedVectors.load(args.src)
-    else:
-        src_emb = keyedvectors.KeyedVectors.load_word2vec_format(args.src)
+    src_emb = Embedding.load(args.src)
 
     logger.info('Load trg embedding')
-    if args.trg.endswith('.gensim'):
-        trg_emb = keyedvectors.KeyedVectors.load(args.trg)
-    else:
-        trg_emb = keyedvectors.KeyedVectors.load_word2vec_format(args.trg)
+    trg_emb = Embedding.load(args.trg)
 
     logger.info('Load dictionary')
     dictionary = defaultdict(list)
@@ -46,7 +41,7 @@ def main():
 
     for src, trgs in dictionary.items():
         try:
-            src_vec = src_emb[src]
+            src_vec = src_emb.get_emb(src)
             trans = trg_emb.similar_by_vector(src_vec)
             total += 1
             if any(tran_word in trgs for tran_word, score in trans):
@@ -54,11 +49,7 @@ def main():
         except KeyError:
             oov += 1
 
-
     logger.info('Accuracy={:.3f}'.format(hit / total))
-        
-
-
 
 if __name__ == '__main__':
     main()
