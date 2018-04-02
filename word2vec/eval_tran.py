@@ -19,9 +19,19 @@ def main():
 
     args = parser.parse_args()
 
-    src_emb = keyedvectors.KeyedVectors.load_word2vec_format(args.src)
-    trg_emb = keyedvectors.KeyedVectors.load_word2vec_format(args.trg)
+    logger.info('Load src embedding')
+    if args.src.endswith('.gensim'):
+        src_emb = keyedvectors.KeyedVectors.load(args.src)
+    else:
+        src_emb = keyedvectors.KeyedVectors.load_word2vec_format(args.src)
 
+    logger.info('Load trg embedding')
+    if args.trg.endswith('.gensim'):
+        trg_emb = keyedvectors.KeyedVectors.load(args.trg)
+    else:
+        trg_emb = keyedvectors.KeyedVectors.load_word2vec_format(args.trg)
+
+    logger.info('Load dictionary')
     dictionary = defaultdict(list)
 
     with open(args.dictionary) as f:
@@ -29,6 +39,7 @@ def main():
             src, trg = line.split()
             dictionary[src].append(trg)
 
+    logger.info('Evaluate')
     total = 0
     hit = 0
     oov = 0

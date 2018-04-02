@@ -17,8 +17,13 @@ def main():
 
     args = parser.parse_args()
 
-    emb = keyedvectors.KeyedVectors.load_word2vec_format(args.input)
+    logger.info('Loading embedding')
+    if args.input.endswith('.gensim'):
+        emb = keyedvectors.KeyedVectors.load(args.input)
+    else:
+        emb = keyedvectors.KeyedVectors.load_word2vec_format(args.input)
 
+    logger.info('Evaluating')
     pearson, spearman, oov_rate = emb.evaluate_word_pairs(args.wordsim)
 
     logger.info('Coverage={:.3}; Pearson={:.3f}; Spearman={:.3f}'.format(1-oov_rate/100, pearson[0], spearman[0]))
