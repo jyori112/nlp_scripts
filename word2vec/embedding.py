@@ -27,7 +27,7 @@ class Embedding:
                 if not line:
                     continue
 
-                word1, word2, sim = line.lower().split()
+                word1, word2, sim = line.lower().split('\t')
 
                 try:
                     idx1 = self.word2id[word1]
